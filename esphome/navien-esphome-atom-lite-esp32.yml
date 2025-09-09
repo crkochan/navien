@@ -11,6 +11,7 @@ esphome:
     board_build.flash_mode: dio
   project:
     name: "Navien.ATOM-Lite-ESP32"
+    version: "${version}"
 
 esp32:
   board: m5stack-atom
