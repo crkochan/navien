@@ -48,12 +48,12 @@ button:
 climate:
   - platform: navien
     id: navien_climate
+    name: Target Temperature
+    unit_of_measurement: '°F'
     visual:
       min_temperature: 97F
       max_temperature: 120F
       temperature_step: '1°F'
-      unit_of_measurement: '°F'
-    name: Target Temperature
 
 sensor:
   - platform: uptime
