@@ -26,13 +26,15 @@ climate::ClimateTraits NavienClimate::traits(){
 }
   
 void NavienClimate::control(const climate::ClimateCall &call){
-  if (call.get_target_temperature().has_value()){
-      
-    esphome::optional<float> f = call.get_target_temperature();
-    float target = *f;
+  if (call.get_target_temperature().has_value()) {
+    const float c = *call.get_target_temperature();
+    float f = c * 9.0f / 5.0f + 32.0f;
+    f = roundf(f);
     
     ESP_LOGD(TAG, "Setting target temperature to %f", target);
     parent->send_set_temp_cmd(target);
+    this->target_temperature = (f - 32.0f) * 5.0f / 9.0f;
+    this->publish_state();
   }
     
   //    std::string mode_id;
