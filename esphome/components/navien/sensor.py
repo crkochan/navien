@@ -137,7 +137,7 @@ async def to_code(config):
 
     if CONF_WATER_UTILIZATION in config:
         sens = await sensor.new_sensor(config[CONF_WATER_UTILIZATION])
-        cg.add(sens.set_icon(config[CONF_WATER_UTILIZATION]].get(CONF_ICON, "mdi:water-percent")))
+        cg.add(sens.set_icon(config[CONF_WATER_UTILIZATION].get(CONF_ICON, "mdi:water-percent")))
         cg.add(var.set_water_utilization_sensor(sens))
         
     if CONF_GAS_TOTAL in config:
