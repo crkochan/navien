@@ -9,6 +9,8 @@ esphome:
   name_add_mac_suffix: true
   platformio_options:
     board_build.flash_mode: dio
+  project:
+    name: "Navien.ATOM-Lite-ESP32"
 
 esp32:
   board: m5stack-atom
