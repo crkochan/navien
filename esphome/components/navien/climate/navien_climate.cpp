@@ -32,7 +32,7 @@ void NavienClimate::control(const climate::ClimateCall &call){
     f = roundf(f);
     
     ESP_LOGD(TAG, "Setting target temperature to %f", target);
-    parent->send_set_temp_cmd(target);
+    parent->send_set_temp_cmd(f);
     this->target_temperature = (f - 32.0f) * 5.0f / 9.0f;
     this->publish_state();
   }
