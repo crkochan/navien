@@ -50,8 +50,8 @@ climate:
     id: navien_climate
     name: Target Temperature
     visual:
-      min_temperature: 97
-      max_temperature: 122
+      min_temperature: 97F
+      max_temperature: 122F
       temperature_step: '1'
 
 sensor:
