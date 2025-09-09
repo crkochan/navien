@@ -1,6 +1,7 @@
 substitutions:
   name: navien-heater
   device_description: "Navien Gas Water Heater"
+  version:  "0.0.0.1"
 
 logger:
   level: INFO
