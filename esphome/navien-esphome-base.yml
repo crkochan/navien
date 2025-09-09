@@ -51,8 +51,8 @@ climate:
     name: Target Temperature
     visual:
       min_temperature: 97F
-      max_temperature: 120.5F
-      temperature_step: '0.5'
+      max_temperature: 121F
+      temperature_step: '1'
 
 sensor:
   - platform: uptime
