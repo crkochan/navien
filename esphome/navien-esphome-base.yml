@@ -51,7 +51,7 @@ climate:
     name: Target Temperature
     visual:
       min_temperature: 97F
-      max_temperature: 120.2F
+      max_temperature: 120.5F
       temperature_step: '0.5'
 
 sensor:
