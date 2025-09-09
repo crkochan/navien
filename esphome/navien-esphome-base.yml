@@ -50,9 +50,9 @@ climate:
     id: navien_climate
     name: Target Temperature
     visual:
-      min_temperature: 97F
-      max_temperature: 120.2F
-      temperature_step: '1°F'
+      min_temperature: 36
+      max_temperature: 49
+      temperature_step: '1'
 
 sensor:
   - platform: uptime
