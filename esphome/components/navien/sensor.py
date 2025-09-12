@@ -31,6 +31,7 @@ from esphome.const import (
     DEVICE_CLASS_CONNECTIVITY,
     DEVICE_CLASS_GAS,
     
+    STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
     
     UNIT_CUBIC_METER,
@@ -49,7 +50,7 @@ from esphome.const import (
 #)
 
 UNIT_LPM  = "l/m"
-UNIT_BTU  = "BTU"
+UNIT_BTU  = "BTU/h"
 
 CONF_INLET_TEMPERATURE  = "inlet_temperature"
 CONF_OUTLET_TEMPERATURE = "outlet_temperature"
@@ -75,22 +76,27 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_TARGET_TEMPERATURE): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_INLET_TEMPERATURE): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_OUTLET_TEMPERATURE): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CELSIUS,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_WATER_FLOW): sensor.sensor_schema(
                 unit_of_measurement=UNIT_LPM,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_WATER_UTILIZATION): sensor.sensor_schema(
                 unit_of_measurement=UNIT_PERCENT,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_GAS_TOTAL): sensor.sensor_schema(
                 unit_of_measurement=UNIT_CUBIC_METER,
@@ -101,9 +107,10 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_GAS_CURRENT): sensor.sensor_schema(
                 unit_of_measurement=UNIT_BTU,
                 accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_CONN_STATUS): binary_sensor.binary_sensor_schema(
-                device_class = DEVICE_CLASS_CONNECTIVITY
+                device_class = DEVICE_CLASS_CONNECTIVITY,
             ),
             cv.Optional(CONF_RECIRC_STATUS): binary_sensor.binary_sensor_schema(),
             cv.Optional(CONF_REAL_TIME): cv.boolean
@@ -147,7 +154,6 @@ async def to_code(config):
         
     if CONF_GAS_TOTAL in config:
         sens = await sensor.new_sensor(config[CONF_GAS_TOTAL])
-        # cg.add(sens.set_icon(config[CONF_GAS_TOTAL].get(CONF_ICON, "mdi:meter-gas")))
         cg.add(var.set_gas_total_sensor(sens))
 
     if CONF_GAS_CURRENT in config:
