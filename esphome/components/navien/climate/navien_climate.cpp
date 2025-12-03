@@ -9,7 +9,7 @@ namespace navien {
 static const char *TAG = "navien.climate";
 
 static const std::set<climate::ClimateMode> supported_modes = {climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT};
-static const std::set<climate::ClimateFeature> supported_features = {climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE};
+static constexpr uint32_t supported_features = climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE;
   
 void NavienClimate::setup(){
 }
