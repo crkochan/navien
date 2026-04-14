@@ -22,6 +22,5 @@ CONFIG_SCHEMA = (
 async def to_code(config):
     var = await button.new_button(config)
     await cg.register_component(var, config)
-
     hub = await cg.get_variable(config[NAVIEN_CONFIG_ID])
     cg.add(var.set_parent(hub))

@@ -1,6 +1,9 @@
 
 
+#include <array>
 #include "esphome.h"
+#include "esphome/components/climate/climate_mode.h"
+//#include "esphome/components/climate/climate_traits.h"
 #include "navien_climate.h"
 
 namespace esphome {
@@ -8,20 +11,21 @@ namespace navien {
   
 static const char *TAG = "navien.climate";
 
-static constexpr climate::ClimateModeMask supported_modes = {climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT};
-static constexpr uint32_t supported_features = climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE;
-  
+//std::set<climate::ClimateMode> supported_modes = {climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT};
+static constexpr climate::ClimateModeMask supported_modes = {climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT}; 
+
 void NavienClimate::setup(){
 }
   
 void NavienClimate::dump_config(){
 }
 
-
 climate::ClimateTraits NavienClimate::traits(){
     auto traits = climate::ClimateTraits();
     
-    traits.add_feature_flags(supported_features);
+    traits.add_feature_flags(esphome::climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
+
+    //traits.add_feature_flags(supported_features);
     traits.set_supported_modes(supported_modes);
     return traits;
 }
@@ -32,12 +36,11 @@ void NavienClimate::control(const climate::ClimateCall &call){
     float target = *target_temperature;
     
     ESP_LOGD(TAG, "Setting target temperature to %f", target);
-    parent->send_set_temp_cmd(target);
+    parent->send_dhw_set_temp_cmd(target);
   }
     
-  //    std::string mode_id;
   if (call.get_mode().has_value()) {
-    climate::ClimateMode mode = call.get_mode().value();
+    esphome::climate::ClimateMode mode = call.get_mode().value();
     ESP_LOGD(TAG, "Setting mode to %s", climate::climate_mode_to_string(mode));
     switch(mode){
     case climate::ClimateMode::CLIMATE_MODE_OFF:

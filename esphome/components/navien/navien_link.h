@@ -67,17 +67,19 @@ class NavienLinkVisitorI{
 public:
   /**
    * Called then the direction is from Navien to reporting device
-   * and type field is PACKET_TYPE_WATER
+   * and type field is PACKET_DST_WATER
    * @param water - the data payload of the water packet
+   * @param src - the source address from the packet header
    */  
-  virtual void on_water(const WATER_DATA & water) = 0;
+  virtual void on_water(const WATER_DATA & water, uint8_t src) = 0;
 
   /**
    * Called then the direction is from Navien to reporting device
-   * and type field is PACKET_TYPE_GAS
+   * and type field is PACKET_DST_GAS
    * @param gas - the data payload of the gas packet
+   * @param src - the source address from the packet header
    */  
-  virtual void on_gas(const GAS_DATA & gas)   = 0;
+  virtual void on_gas(const GAS_DATA & gas, uint8_t src)   = 0;
   virtual void on_error()     = 0;
 };
 
@@ -88,7 +90,23 @@ public:
  */
 class NavienLink  {
 public:
-  NavienLink(NavienUartI & u, NavienLinkVisitorI & v) : uart(u), cb(v){}
+  static NavienLink* get_instance(NavienUartI* uart = nullptr);
+public:
+  static const uint8_t NAVIEN_CASCADE_MAX = 16;
+  NavienLink(NavienUartI* u) : uart(u) {
+    memset(visitors_, 0, sizeof(visitors_));
+  }
+
+  /**
+   * Register a visitor to receive callbacks when packets are received.
+   * @param visitor - pointer to the visitor instance
+   * @param src - index in the visitor array (0-15), defaults to 0
+   */
+  void add_visitor(NavienLinkVisitorI *visitor, uint8_t src = 0) {
+    if (visitor != nullptr && src < NAVIEN_CASCADE_MAX) {
+      visitors_[src] = visitor;
+    }
+  }
 
   /**
    * Reads whaterver data came through UART and attempts to interpret it as Navien protocol data.
@@ -96,7 +114,7 @@ public:
    * It also send the regular heartbeat packets to the Navien heater
    * Lastly, depending on the outcome of packet receiption this method updates the state of Navilink - connected or not
    */
-  void receive();
+  void receive(); // Implementation should call all registered visitors
 
   /**
    * Returns true if connected, otherwise false.
@@ -105,12 +123,19 @@ public:
   */
   
   /**
+   * Returns true if we're sharing the RS485 bus with another NaviLink-like device, otherwise false.
+   */
+  bool is_other_navilink_installed(){return this->other_navilink_installed;}
+  
+  /**
    * Send commands
    */
   void send_turn_on_cmd();
   void send_turn_off_cmd();
   void send_hot_button_cmd();
-  void send_set_temp_cmd(float temp);
+  void send_scheduled_recirculation_on_cmd();
+  void send_scheduled_recirculation_off_cmd();
+  void send_dhw_set_temp_cmd(float temp);
 
   
 public:
@@ -119,8 +144,9 @@ public:
 
   static uint8_t t2f(uint8_t);
   static float flow2gpm(uint8_t f);
-  static uint8_t t2c(uint8_t);
+  static float t2c(uint8_t);
   static float flow2lpm(uint8_t f);
+  static float ot2c(uint8_t);
 
 protected:
   /**
@@ -159,16 +185,19 @@ protected:
    *
    * @param buffer - command to be sent.
    * @param len - the length of buffer
+   * @param tries - number of times to send the command
    */
-  void send_cmd(const uint8_t * buffer, uint8_t len);
+  void send_cmd(const uint8_t * buffer, uint8_t len, uint8_t tries = 2);
+  void on_error();
   
 protected:
   // Uart Send/Receive facility
-  NavienUartI       & uart;
+  NavienUartI*       uart;
 
   // Callback to be called when various packet types
   // are received
-  NavienLinkVisitorI & cb;
+  // Visitor array for callbacks
+  NavienLinkVisitorI *visitors_[NAVIEN_CASCADE_MAX];
 
   // Keeps track of the state machine and iterates through
   // initialized -> marker found -> header parsed -> data parsed -> initialized
@@ -176,6 +205,9 @@ protected:
 
   // Data received off the wire
   RECV_BUFFER  recv_buffer;
+
+  // Flag indicating if we've seen control packets that we didn't send, which means an actual NaviLink is also present
+  bool other_navilink_installed = false;
 
   // Buffer for queued commands.
   // TODO: add thread safety - cmd_buffer is used in different thread contexts
